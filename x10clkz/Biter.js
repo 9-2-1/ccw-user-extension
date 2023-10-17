@@ -63,7 +63,7 @@ class Biter {
 
 		// 我懒得上下翻代码页面来定义函数就这样写
 
-		eval("this."+block.opcode+"=func");
+		this[block.opcode]=func;
 		return block;
 	}
 
