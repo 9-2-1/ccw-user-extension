@@ -67,6 +67,27 @@ class Biter {
 		return block;
 	}
 
+	// 把函数转换成出错后捕获错误的函数
+	_failsafe(func, fail){
+		return function _failsafefunction() {
+			try {
+				// 用收到的参数调用原函数
+				return func.apply(this, arguments);
+			} catch(err) {
+				// 出错则记录错误，并返回错误值
+				console.error(err);
+				return fail;
+			}
+		}
+	}
+
+	// 进制转换
+	_turnbase(A, Arad, Brad) {
+		return this._failsafe(() => {
+			return parseInt(A, Arad).toString(Brad); // int
+		}, NaN)();
+	}
+
 	getInfo() {
 		return {
 			id: extensionId,
@@ -94,7 +115,7 @@ class Biter {
 							defaultValue: 28,
 						}
 					}
-				}, ({A, B}) => BigInt(A) & BigInt(B)),
+				}, this._failsafe(({A, B}) => BigInt(A) & BigInt(B)), NaN),
 				this.b({
 					opcode: "or",
 					blockType: "reporter",
@@ -109,7 +130,7 @@ class Biter {
 							defaultValue: 28,
 						}
 					}
-				}, ({A, B}) => BigInt(A) | BigInt(B)),
+				}, this._failsafe(({A, B}) => BigInt(A) | BigInt(B), NaN)),
 				this.b({
 					opcode: "xor",
 					blockType: "reporter",
@@ -124,7 +145,7 @@ class Biter {
 							defaultValue: 28,
 						}
 					}
-				}, ({A, B}) => BigInt(A) ^ BigInt(B)),
+				}, this._failsafe(({A, B}) => BigInt(A) ^ BigInt(B), NaN)),
 				this.b({
 					opcode: "shl",
 					blockType: "reporter",
@@ -139,7 +160,7 @@ class Biter {
 							defaultValue: 28,
 						}
 					}
-				}, ({A, B}) => BigInt(A) << BigInt(B)),
+				}, this._failsafe(({A, B}) => BigInt(A) << BigInt(B), NaN)),
 				this.b({
 					opcode: "shr",
 					blockType: "reporter",
@@ -154,7 +175,7 @@ class Biter {
 							defaultValue: 28,
 						}
 					}
-				}, ({A, B}) => BigInt(A) >> BigInt(B)),
+				}, this._failsafe(({A, B}) => BigInt(A) >> BigInt(B), NaN)),
 				this.b({
 					opcode: "not",
 					blockType: "reporter",
@@ -165,7 +186,7 @@ class Biter {
 							defaultValue: 38,
 						},
 					}
-				}, ({A, B}) => ~BigInt(A)),
+				}, this._failsafe(({A, B}) => ~BigInt(A), NaN)),
 				
 				"---"+this.formatMessage("Biter.NumberBase"),
 				this.b({
@@ -178,11 +199,7 @@ class Biter {
 							defaultValue: 3791,
 						},
 					}
-				}, ({A}) => {
-					let result = Number(A).toString(2);
-					if (result == "NaN") return '';
-					return result;
-				}),
+				}, ({A}) => this._turnbase(A, 10, 2)),
 				this.b({
 					opcode: "Bin2Dec",
 					blockType: "reporter",
@@ -193,7 +210,7 @@ class Biter {
 							defaultValue: "10010101",
 						},
 					}
-				}, ({A}) => parseInt(A, 2) || ''),
+				}, ({A}) => this._turnbase(A, 2, 10)),
 				this.b({
 					opcode: "Dec2Hex",
 					blockType: "reporter",
@@ -204,11 +221,7 @@ class Biter {
 							defaultValue: 3758,
 						},
 					}
-				}, ({A}) => {
-					let result = Number(A).toString(16);
-					if (result == "NaN") return '';
-					return result;
-				}),
+				}, ({A}) => this._turnbase(A, 10, 16)),
 				this.b({
 					opcode: "Bin2Hex",
 					blockType: "reporter",
@@ -219,11 +232,7 @@ class Biter {
 							defaultValue: "100101"
 						},
 					}
-				}, ({A}) => {
-					let result = Number(A).toString(16);
-					if (result == "NaN") return '';
-					return result;
-				}),
+				}, ({A}) => this._turnbase(A, 2, 16)),
 				this.b({
 					opcode: "Hex2Dec",
 					blockType: "reporter",
@@ -234,7 +243,7 @@ class Biter {
 							defaultValue: "ab18",
 						},
 					}
-				}, ({A}) => parseInt(A, 16) || ''),
+				}, ({A}) => this._turnbase(A, 16, 10)),
 				this.b({
 					opcode: "Hex2Bin",
 					blockType: "reporter",
@@ -245,11 +254,7 @@ class Biter {
 							defaultValue: "39abfc",
 						},
 					}
-				}, ({A}) => {
-					let result = parseInt(A, 16).toString(2);
-					if (result == "NaN") return '';
-					return result;
-				}),
+				}, ({A}) => this._turnbase(A, 16, 2)),
 				this.b({
 					opcode: "Rad2Rad",
 					blockType: "reporter",
@@ -268,11 +273,7 @@ class Biter {
 							defaultValue: 11,
 						},
 					}
-				}, ({R, A, B}) => {
-					let result = parseInt(A, Number(R)).toString(Number(B));
-					if (result == "NaN") return '';
-					return result;
-				}),
+				}, ({A, R, B}) => this._turnbase(A, R, B)),
 				this.b({
 					opcode: "Dec2Rad",
 					blockType: "reporter",
@@ -287,11 +288,7 @@ class Biter {
 							defaultValue: 8
 						},
 					}
-				}, ({A, B}) => {
-					let result = Number(A).toString(Number(B));
-					if (result == "NaN") return '';
-					return result;
-				}),
+				}, ({A, B}) => this._turnbase(A, 10, B)),
 				this.b({
 					opcode: "Rad2Dec",
 					blockType: "reporter",
@@ -306,7 +303,7 @@ class Biter {
 							defaultValue: "380ab",
 						},
 					}
-				}, ({R, A}) => parseInt(A, Number(R)) || ''),
+				}, ({R, A}) => this._turnbase(A, R, 10)),
 			],
 		};
 	}
