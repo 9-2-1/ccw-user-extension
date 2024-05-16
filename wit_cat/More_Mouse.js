@@ -17,15 +17,15 @@ class WitCatMouse {
 		/**
 		 * 鼠标x移动速度
 		 */
-		this.xMouse = 0;
+		this.MouseSpeedX = 0;
 
 		/**
 		 * 鼠标y移动速度
 		 */
-		this.yMouse = 0;
+		this.MouseSpeedY = 0;
 		/**
-		* 鼠标x
-		*/
+		 * 鼠标x
+		 */
 		this.MouseX = 0;
 
 		/**
@@ -930,9 +930,9 @@ class WitCatMouse {
 	 */
 	acceleration(args) {
 		if (args.way === 'x') {
-			return this.xMouse;
+			return this.MouseSpeedX;
 		}
-		return -this.yMouse;
+		return -this.MouseSpeedY;
 	}
 
 	/**
@@ -1664,14 +1664,14 @@ class WitCatMouse {
 			}
 			this.MouseX = ev.clientX;
 			this.MouseY = ev.clientY;
-			this.xMouse = ev.movementX; // 获得鼠标指针的x移动量
-			this.yMouse = ev.movementY; // 获得鼠标指针的y移动量
+			this.MouseSpeedX = ev.movementX; // 获得鼠标指针的x移动量
+			this.MouseSpeedY = ev.movementY; // 获得鼠标指针的y移动量
 			if (this.timer !== null) {
 				clearTimeout(this.timer);
 			}
 			this.timer = setTimeout(() => {
-				this.xMouse = 0;
-				this.yMouse = 0;
+				this.MouseSpeedX = 0;
+				this.MouseSpeedY = 0;
 			}, 30);
 		});
 		// 多指触控
@@ -1683,15 +1683,15 @@ class WitCatMouse {
 		});
 		canvas.addEventListener('touchmove', (e) => {
 			if (e.targetTouches[0] !== undefined && this.touch[0] !== undefined) {
-				this.xMouse = e.targetTouches[0].clientX - this.touch[0].clientX; // 获得手指的x移动量
-				this.yMouse = e.targetTouches[0].clientY - this.touch[0].clientY; // 获得手指的y移动量
+				this.MouseSpeedX = e.targetTouches[0].clientX - this.touch[0].clientX; // 获得手指的x移动量
+				this.MouseSpeedY = e.targetTouches[0].clientY - this.touch[0].clientY; // 获得手指的y移动量
 			}
 			if (this.timer !== null) {
 				clearTimeout(this.timer);
 			}
 			this.timer = setTimeout(() => {
-				this.xMouse = 0;
-				this.yMouse = 0;
+				this.MouseSpeedX = 0;
+				this.MouseSpeedY = 0;
 			}, 30);
 			// e.targetTouches 会随着时间改变，必须复制一份。
 			if (this.timer !== null) {
