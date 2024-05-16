@@ -18,38 +18,6 @@ class WitCatSensoryControl {
 
 		this.runtime = runtime;
 
-		/**
-		 * Scratch 所使用的 canvas，获取不到返回 null
-		 * @return {HTMLCanvasElement | null}
-		 */
-		this.canvas = () => {
-			try {
-				const { canvas } = this.runtime.renderer;
-				if (canvas instanceof HTMLCanvasElement) {
-					return canvas.parentElement;
-				}
-				return null;
-			} catch (err) {
-				return null;
-			}
-		};
-
-		this.canvasSelf = () => {
-			try {
-				const { canvas } = this.runtime.renderer;
-				if (canvas instanceof HTMLCanvasElement) {
-					return canvas;
-				}
-				return null;
-			} catch (err) {
-				return null;
-			}
-		};
-
-		if (this.canvas() === null) {
-			console.error('当前页面不支持多指触控/全屏，请前往作品详情页体验完整作品！');
-			// 注意：在提示之后，扩展仍然在运行。需要在后面引用 Canvas 的部分进行判断。
-		}
 		this._addevent();
 
 		this._formatMessage = runtime.getFormatMessage({
